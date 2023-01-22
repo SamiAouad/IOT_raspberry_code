@@ -29,10 +29,10 @@ def beep_off():
         GPIO.output(BUZ,GPIO.LOW)
 
 def local_nfc(tag_id):
-    file = open("data/nfc_ids.json") 
-    data = json.load(file)
-    for element in data['id']:
-        if element == tag_id:
+    file = open("data/nfc_ids.json", 'r') 
+    data = file.readlines()
+    for line in data:
+        if line.strip() == tag_id:
             return True
     return False
 
@@ -50,6 +50,7 @@ def on_connect(tag):
         response = requests.post(URL + "devices/nfc-badge",headers={"Authorization": "Bearer " + token}, json={'badgeId': str(tag.identifier.hex())}, timeout=5)
         result = response.content
     except requests.exceptions.RequestException as e:
+        print("server is unreachable")
         result = local_nfc(str(tag.identifier.hex()))
         print(result)
     if result:
